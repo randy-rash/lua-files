@@ -180,7 +180,8 @@ do
                         Drawings.Box.Size = Vector2.new(Width, Height)
                         Drawings.Box.Position = Vector2.new(Position.X - Width / 2, Position.Y - Height / 2.2)
                         Drawings.Box.Visible = true
-                        Drawings.Box.Color = Settings.Box.Color
+                        Drawings.Box.Color = Settings.Box.Color or Color3.new(255,255,255)
+
 
                         Drawings.BoxInline.Size = Vector2.new(Width, Height)
                         Drawings.BoxInline.Position = Vector2.new(Position.X - Width / 2, Position.Y - Height / 2.2)
