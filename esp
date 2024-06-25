@@ -23,10 +23,6 @@ getgenv().Settings = {
     Distance = {
         Enabled = true,
         Color = Color3.fromRGB(255, 255, 255)
-    },
-    Weapon = {
-        Enabled = true,
-        Color = Color3.fromRGB(255, 255, 255)
     }
 }
 
@@ -83,7 +79,8 @@ do
                     Box = Drawing.new("Square"),
                     HpBarOutline = Drawing.new("Square"),
                     Hpbar = Drawing.new("Square"),
-                    HealthText = Drawing.new("Text")
+                    HealthText = Drawing.new("Text"),
+                    Distance = Drawing.new("Text")
                 }
             }, {
                 __index = Visuals
@@ -141,6 +138,14 @@ do
             Hptext.Font = 2
             Hptext.Visible = false
             Hptext.Outline = true
+
+            local Distance = Self.Drawings.Distance
+            Distance.Text = "0 s"
+            Distance.Center = true
+            Distance.Size = 13
+            Distance.Font = 2
+            Distance.Visible = false
+            Distance.Outline = true
 
             Visuals.Drawings[Properties.Player] = Self
 
@@ -227,6 +232,18 @@ do
                         Drawings.Hpbar.Visible = false
                         Drawings.HpBarOutline.Visible = false
                     end
+
+                    if Settings.Distance.Enabled then
+                        --[[local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - RootPart.Position).Magnitude
+                        Drawings.Distance.Position = Drawings.Box.Position + Vector2.new(Drawings.Box.Size.X / 2)
+                        Drawings.Distance.Visible = true
+                        Drawings.Distance.Text = string.format("%.2f", distance) .. " studs"
+                        Drawings.Distance.Color = Color3.new(255,255,255)]]
+                    else
+                        Drawings.Distance.Visible = false
+                    end
+
+
                 else
                     for _, Drawing in pairs(Drawings) do
                         Drawing.Visible = false
@@ -237,8 +254,6 @@ do
                     Drawing.Visible = false
                 end
             end
-            game:GetService("RunService").RenderStepped:Wait()
-            return self:Remove()
         end
     end
 end
