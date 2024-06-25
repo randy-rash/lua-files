@@ -142,7 +142,7 @@ do
             local Distance = Self.Drawings.Distance
             Distance.Text = "0 s"
             Distance.Center = true
-            Distance.Size = 13
+            Distance.Size = 16
             Distance.Font = 2
             Distance.Visible = false
             Distance.Outline = true
@@ -234,11 +234,11 @@ do
                     end
 
                     if Settings.Distance.Enabled then
-                        --[[local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - RootPart.Position).Magnitude
-                        Drawings.Distance.Position = Drawings.Box.Position + Vector2.new(Drawings.Box.Size.X / 2)
+                        local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - RootPart.Position).Magnitude
+                        Drawings.Distance.Position = Vector2.new(Drawings.Box.Position.X + Drawings.Box.Size.X / 2, Drawings.Box.Position.Y + Drawings.Box.Size.Y + 5)
                         Drawings.Distance.Visible = true
-                        Drawings.Distance.Text = string.format("%.2f", distance) .. " studs"
-                        Drawings.Distance.Color = Color3.new(255,255,255)]]
+                        Drawings.Distance.Text = string.format(math.floor(distance)) .. " s"
+                        Drawings.Distance.Color = Color3.new(255,255,255)
                     else
                         Drawings.Distance.Visible = false
                     end
@@ -254,6 +254,8 @@ do
                     Drawing.Visible = false
                 end
             end
+            --game:GetService("RunService").RenderStepped:Wait()
+            --return self:Remove()
         end
     end
 end
