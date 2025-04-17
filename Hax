@@ -1,0 +1,147 @@
+local Services = setmetatable({}, {
+    __index = function(_, k)
+        return cloneref(game:GetService(k))
+    end
+})
+
+local Workspace = Services.Workspace
+local Players = Services.Players
+local RunService = Services.RunService
+local UserInputService = Services.UserInputService
+local Camera = Workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+local Hax = {Hooks = {}, Connections = {}, Drawings = {}}
+
+do
+    Hax.Draw = function(Class, Properties)
+        local Drawing = Drawing.new(Class)
+        
+        for key, value in pairs(Properties) do
+            Drawing[key] = value
+        end
+
+        Drawing.Visible = true
+        Drawing.Transparency = 1
+
+        table.insert(Hax.Drawings, Drawing)
+
+        return Drawing
+    end
+    
+    Hax.Thread = function(Func, Name, ...)
+        local Args = {...}
+        local Thread = coroutine.create(function()
+            local Passed, Statement = pcall(Func, unpack(Args))
+            if not Passed then
+                warn('Error in thread ' .. (Name or 'Unnamed') .. ': ' .. tostring(Statement))
+            end
+        end)
+        local Success, ErrorMsg = coroutine.resume(Thread)
+        if not Success then
+            error('Failed to start thread ' .. (Name or 'Unnamed') .. ': ' .. tostring(ErrorMsg))
+        end
+    end
+    
+    Hax.Heartbeat = function(Func)
+        local Connection = RunService.Heartbeat:Connect(Func)
+        table.insert(Hax.Connections, Connection)
+    end
+    
+    Hax.Renderstepped = function(Func)
+        local Connection = RunService.RenderStepped:Connect(Func)
+        table.insert(Hax.Connections, Connection)
+    end
+    
+    Hax.Hookfunc = function(OldFunction, NewFunction)
+        local Old; Old = hookfunction(OldFunction, function(...)
+            return NewFunction(Old, ...)
+        end)
+        table.insert(Hax.Hooks, Old)
+        return Old
+    end
+    
+    Hax.GetClosestPlayerToMouse = function()
+        local MousePos = UserInputService:GetMouseLocation()
+        local Closest, ClosestDistance, RayPos = nil, math.huge, nil
+    
+        for _, Player in ipairs(Players:GetPlayers()) do
+            if Player == LocalPlayer or 
+            not Player.Character or
+            not Player.Character:FindFirstChild('HumanoidRootPart') then continue end
+        
+            local Root = Player.Character:FindFirstChild('HumanoidRootPart')
+            if not Root then continue end
+            local ScreenPos, OnScreen = Camera:WorldToViewportPoint(Root.Position)
+        
+            if not OnScreen then continue end
+
+            local RaycastParams = RaycastParams.new()
+            RaycastParams.FilterDescendantsInstances = {LocalPlayer.Character}
+            RaycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+            local Ray = Workspace:Raycast(Camera.CFrame.Position, (Root.Position - Camera.CFrame.Position).Unit * 5000, RaycastParams)
+
+            if Ray and Ray.Instance:IsDescendantOf(Player.Character) then
+                local Distance = (Vector2.new(ScreenPos.X, ScreenPos.Y) - MousePos).Magnitude
+                
+                if Distance > SilentAimFov then
+                    continue
+                end
+                
+                if Distance < ClosestDistance then
+                    Closest = Player.Character
+                    RayPos = Ray.Position
+                    ClosestDistance = Distance
+                end
+            end
+        end
+    
+        return Closest, RayPos
+    end
+
+    Hax.GetCharacter = function(Player)
+        if Player and Player:IsA('Player') and Player.Character then
+            return Player.Character
+        end
+        return nil
+    end
+    
+    Hax.GetRoot = function(Player)
+        local Character = Hax.GetCharacter(Player)
+        if Character then
+            return Character:FindFirstChild('HumanoidRootPart')
+        end
+        return nil
+    end
+    
+    Hax.PredictVelocity = function(Target, Speed)
+        local CameraPos = Camera.CFrame.Position
+
+        local Distance = (Target.Position - CameraPos).Magnitude
+        local Time = Distance / Speed
+        return Target.CFrame.Position + Target.Velocity * Time
+    end
+    
+    Hax.GetBoundingBox = function(Root)
+        local UpVector = Camera.CFrame.UpVector
+        local TopPos = Root.Position + Root.CFrame:VectorToWorldSpace(Vector3.new(0, 1.3, 0)) + UpVector
+        local BottomPos = Root.Position + Root.CFrame:VectorToWorldSpace(Vector3.new(0, -2.5, 0)) - UpVector
+
+        local TopViewPort, _ = Camera:WorldToViewportPoint(TopPos)
+        local BottomViewPort, _ = Camera:WorldToViewportPoint(BottomPos)
+
+        local Width = math.max(math.abs(TopViewPort.X - BottomViewPort.X), 3)
+        local Height = math.max(math.abs(BottomViewPort.Y - TopViewPort.Y), Width / 2, 3)
+
+        local BoxSize = Vector2.new(math.floor(Height / 1.4), math.floor(Height))
+        local BoxPos = Vector2.new(
+            math.floor((TopViewPort.X + BottomViewPort.X) / 2 - BoxSize.X / 2),
+            math.floor(math.min(TopViewPort.Y, BottomViewPort.Y))
+        )
+
+        return BoxPos, BoxSize
+    end
+end
+
+return Hax
