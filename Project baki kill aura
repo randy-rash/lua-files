@@ -1,0 +1,53 @@
+local Service
+Service = function(Name)
+  return cloneref(game:GetService(Name))
+end
+local Players = Service("Players")
+local Workspace = Service("Workspace")
+local RunService = Service("RunService")
+local UserInputService = Service("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Alive = Workspace.Game.Players
+local Enabled = false
+UserInputService.InputBegan:Connect(function(Input)
+  if Input.KeyCode == Enum.KeyCode.T then
+    Enabled = not Enabled
+    return print(Enabled)
+  end
+end)
+return RunService.Heartbeat:Connect(function()
+  if not (Enabled) then
+    return 
+  end
+  for _, Player in Alive:GetChildren() do
+    local _continue_0 = false
+    repeat
+      if Player.Name == LocalPlayer.Name then
+        _continue_0 = true
+        break
+      end
+      if not (Player.PrimaryPart and Player.Humanoid) then
+        _continue_0 = true
+        break
+      end
+      if Player.Humanoid.Health <= 0 then
+        _continue_0 = true
+        break
+      end
+      if not (isnetworkowner(Player.PrimaryPart)) then
+        _continue_0 = true
+        break
+      end
+      if not (Player:FindFirstChild(LocalPlayer.Name)) then
+        _continue_0 = true
+        break
+      end
+      Player.Humanoid.Health = 0
+      _continue_0 = true
+    until true
+    if not _continue_0 then
+      break
+    end
+  end
+end)
