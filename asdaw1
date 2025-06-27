@@ -80,9 +80,11 @@ local Places = {5913858916, 417267366}
 local ServerHop = function()
     task.wait(5)
 	
+	local Game = Places[math.random(1, #Places)]
+
     local Success, ReqResult = pcall(function()
         return game:HttpGet(
-            'https://games.roblox.com/v1/games/' .. Places[math.random(1, #Places)] .. '/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true',
+            'https://games.roblox.com/v1/games/' .. Game .. '/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true',
             true 
         )
     end)
@@ -126,7 +128,7 @@ local ServerHop = function()
 
     if #Servers > 0 then
         local SelectedServer = Servers[math.random(1, #Servers)]
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, SelectedServer, LocalPlayer)
+        TeleportService:TeleportToPlaceInstance(Game, SelectedServer, LocalPlayer)
     end
 end
 
