@@ -1,7 +1,5 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
 
-task.wait(3) -- we wait
-
 local Services = function(Name)
     return cloneref(game:GetService(Name))
 end
@@ -19,7 +17,16 @@ local LocalPlayer = Players.LocalPlayer
 local LocalCharacter = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local LocalHumanoidRootPart = LocalCharacter:WaitForChild('HumanoidRootPart')
 
-local ChatMain = require(LocalPlayer.PlayerScripts.ChatScript.ChatMain)
+
+-- idfk anymore
+repeat task.wait() until LocalPlayer:FindFirstChild("PlayerScripts")
+local PlayerScripts = LocalPlayer.PlayerScripts
+
+repeat task.wait() until PlayerScripts:FindFirstChild("ChatScript")
+local ChatScript = PlayerScripts.ChatScript
+
+repeat task.wait() until ChatScript:FindFirstChild("ChatMain")
+local ChatMain = require(ChatScript.ChatMain)
 
 -- ts is self explanatory
 
