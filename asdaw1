@@ -57,8 +57,8 @@ end)
 end
 
 local TimePerPlayer = 5
-local ChatTime = 2
-local ServerHopTime = 15
+local ChatTime = 1
+local ServerHopTime = 5
 
 for _,v in workspace:GetDescendants() do
 	if v:IsA('Seat') then
