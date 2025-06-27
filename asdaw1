@@ -36,8 +36,8 @@ repeat task.wait() until ChatMain.MessagePosted
 
 --all of these are in seconds
 local TimePerPlayer = 5
-local ChatTime = 2
-local ServerHopTime = 60
+local ChatTime = 3
+local ServerHopTime = 120
 
 local Commands = {
 	'size me 2',
@@ -51,10 +51,12 @@ local Commands = {
 	'fire'
 }
 
-for _, Command in Commands do
-	ChatMain.MessagePosted.fire('All', '/'.. tostring(Command))
-	task.wait(1)
-end
+task.spawn(function ()
+	for _, Command in Commands do
+		ChatMain.MessagePosted.fire('All', '/'.. tostring(Command))
+		task.wait(1)
+	end
+end)
 
 local Messages = { 
     "join /burying we're a new hangout game",
@@ -175,8 +177,8 @@ RunService.RenderStepped:Connect(function()
         return
     end
 
-    LocalHumanoidRootPart.CFrame = HumanoidRootPart.CFrame * CFrame.Angles(0, math.random() * math.pi*2, 0)
-	
+    LocalHumanoidRootPart.CFrame = HumanoidRootPart.CFrame * CFrame.Angles(math.random() * math.pi*2, math.random() * math.pi*2, math.random() * math.pi*2)
+
     if tick() - TrackStartTime >= TimePerPlayer or HumanoidRootPart.Velocity.Magnitude > 500 then
         CurrentIndex += 1
         TrackStartTime = tick()
