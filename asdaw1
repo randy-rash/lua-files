@@ -40,18 +40,20 @@ local ChatTime = 2
 local ServerHopTime = 60
 
 local Commands = {
-	'size me 4',
+	'size me 2',
 	'name me '.. string.rep('burying ', 100),
 	'color me red',
 	'hat me 24114402',
 	'hat me 305888394',
 	'hat me 33070696',
-	'hat me 24112667'
+	'hat me 24112667',
+	'sparkles',
+	'fire'
 }
 
 for _, Command in Commands do
 	ChatMain.MessagePosted.fire('All', '/'.. tostring(Command))
-	task.wait(0.5)
+	task.wait(1)
 end
 
 local Messages = { 
