@@ -61,29 +61,53 @@ local Messages = {
 }
 
 local ServerHop = function()
-     local Success, ReqResult = pcall(function()
-        return game:HttpGet('https://games.roblox.com/v1/games/' .. game.PlaceId .. '/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true')
+    task.wait(5)
+
+    local Success, ReqResult = pcall(function()
+        return game:HttpGet(
+            'https://games.roblox.com/v1/games/' .. game.PlaceId .. '/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true',
+            true 
+        )
     end)
-    
+
     if not Success then
-        warn('Failed to get servers:', ReqResult)
-        return false
+        warn('Request failed', ReqResult)
+        return 
     end
-    
+
+    if ReqResult == '{"errors":[{"code":0,"message":"Too many requests"}]}' then
+        warn('Rate limited')
+        task.wait(30)
+        return 
+    end
+
+    if not ReqResult or ReqResult == "" then
+        warn("[ServerHop] Empty response from API")
+        return 
+    end
+
     local Success, Body = pcall(HttpService.JSONDecode, HttpService, ReqResult)
-    if not Success or not Body or not Body.data then
-        warn('Failed to decode JSON')
-        return false
+    if not Success then
+        warn('Cannot decode JSON', ReqResult)
+        return 
+    end
+
+    if not Body or not Body.data then
+        return
     end
 
     local Servers = {}
-    for _, Server in Body.data do
-        if type(Server) == "table" and tonumber(Server.playing) and tonumber(Server.maxPlayers) and 
-           Server.playing < Server.maxPlayers and Server.id ~= game.JobId then
+    for _, Server in ipairs(Body.data) do
+        if type(Server) == "table" 
+            and tonumber(Server.playing) 
+            and tonumber(Server.maxPlayers) 
+            and Server.playing < Server.maxPlayers 
+            and Server.id ~= game.JobId 
+        then
             table.insert(Servers, Server.id)
         end
     end
-    
+
     if #Servers > 0 then
         local SelectedServer = Servers[math.random(1, #Servers)]
         TeleportService:TeleportToPlaceInstance(game.PlaceId, SelectedServer, LocalPlayer)
@@ -93,9 +117,8 @@ end
 task.spawn(function()
 	queueonteleport([[loadstring(game:HttpGet('https://raw.githubusercontent.com/randy-rash/lua-files/refs/heads/main/asdaw1'))()]])
 	task.wait(ServerHopTime)
-	while task.wait() do
-		ServerHop()
-	end
+
+	ServerHop()
 end)
 
 local Chat = function(Message)
