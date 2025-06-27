@@ -37,7 +37,7 @@ repeat task.wait() until ChatMain.MessagePosted
 --all of these are in seconds
 local TimePerPlayer = 5
 local ChatTime = 2
-local ServerHopTime = 5
+local ServerHopTime = 60
 
 local Commands = {
 	'size me 4',
@@ -51,7 +51,7 @@ local Commands = {
 
 for _, Command in Commands do
 	ChatMain.MessagePosted.fire('All', '/'.. tostring(Command))
-	task.wait()
+	task.wait(0.5)
 end
 
 local Messages = { 
