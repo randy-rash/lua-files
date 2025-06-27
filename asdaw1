@@ -68,8 +68,12 @@ local function ServerHop()
         return
     end
     
-	local Body = HttpService:JSONDecode(ReqResult)
-
+	local Success, Body = pcall(HttpService.JSONDecode, HttpService, ReqResult)
+    if not Success or not Body or not Body.data then
+        warn("Failed to decode server data")
+        return
+    end
+	
     for _, Server in Body.data do
         if typeof(Server) == 'table' and tonumber(Server.playing) and tonumber(Server.maxPlayers) and 
            Server.playing < Server.maxPlayers and Server.id ~= game.JobId then
