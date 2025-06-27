@@ -55,9 +55,10 @@ for _, Command in Commands do
 end
 
 local Messages = { 
-    'hi1',
-    'hi2',
-    'hi3',
+    "join /burying we're a new hangout game",
+	'join /burying if ur cool',
+	"bored? join /burying we're making a hangout game",
+	'bro what is happening in /burying'
 }
 
 local ServerHop = function()
@@ -82,7 +83,6 @@ local ServerHop = function()
     end
 
     if not ReqResult or ReqResult == "" then
-        warn("[ServerHop] Empty response from API")
         return 
     end
 
