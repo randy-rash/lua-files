@@ -56,26 +56,25 @@ local Messages = {
     'hi3',
 }
 
-local function ServerHop()
-    local Servers = {}
-    
-    local Success, ReqResult = pcall(function()
+local ServerHop = function()
+     local Success, ReqResult = pcall(function()
         return game:HttpGet('https://games.roblox.com/v1/games/' .. game.PlaceId .. '/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true')
     end)
     
     if not Success then
         warn('Failed to get servers:', ReqResult)
-        return
+        return false
     end
     
-	local Success, Body = pcall(HttpService.JSONDecode, HttpService, ReqResult)
+    local Success, Body = pcall(HttpService.JSONDecode, HttpService, ReqResult)
     if not Success or not Body or not Body.data then
         warn('Failed to decode JSON')
-        return
+        return false
     end
 
+    local Servers = {}
     for _, Server in Body.data do
-        if typeof(Server) == 'table' and tonumber(Server.playing) and tonumber(Server.maxPlayers) and 
+        if type(Server) == "table" and tonumber(Server.playing) and tonumber(Server.maxPlayers) and 
            Server.playing < Server.maxPlayers and Server.id ~= game.JobId then
             table.insert(Servers, Server.id)
         end
@@ -84,15 +83,13 @@ local function ServerHop()
     if #Servers > 0 then
         local SelectedServer = Servers[math.random(1, #Servers)]
         TeleportService:TeleportToPlaceInstance(game.PlaceId, SelectedServer, LocalPlayer)
-    else
-        warn('No available servers found')
     end
 end
 
 task.spawn(function()
 	queueonteleport([[loadstring(game:HttpGet('https://raw.githubusercontent.com/randy-rash/lua-files/refs/heads/main/asdaw1'))()]])
 	task.wait(ServerHopTime)
-	while task.wait(0.5) do
+	while task.wait() do
 		ServerHop()
 	end
 end)
