@@ -130,6 +130,9 @@ local ServerHop = function()
     end
 end
 
+game:GetService("RunService"):Set3dRenderingEnabled(false)
+setfpscap(30)
+
 task.spawn(function()
 	queueonteleport([[loadstring(game:HttpGet('https://raw.githubusercontent.com/randy-rash/lua-files/refs/heads/main/asdaw1'))()]])
 	task.wait(ServerHopTime)
