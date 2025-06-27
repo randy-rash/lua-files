@@ -35,9 +35,6 @@ repeat task.wait() until ChatMain.MessagePosted
 -- ts is self explanatory
 
 --all of these are in seconds
-local TimePerPlayer = 5
-local ChatTime = 2
-local ServerHopTime = 120
 
 local Commands = {
 	'size me 2',
@@ -57,8 +54,11 @@ task.spawn(function ()
 		task.wait(1)
 	end
 end)
-
 end
+
+local TimePerPlayer = 5
+local ChatTime = 2
+local ServerHopTime = 120
 
 for _,v in workspace:GetDescendants() do
 	if v:IsA('Seat') then
