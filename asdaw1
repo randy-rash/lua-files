@@ -92,7 +92,7 @@ end
 task.spawn(function()
 	queueonteleport([[loadstring(game:HttpGet('https://raw.githubusercontent.com/randy-rash/lua-files/refs/heads/main/asdaw1'))()]])
 	task.wait(ServerHopTime)
-	while task.wait() do
+	while task.wait(0.5) do
 		ServerHop()
 	end
 end)
