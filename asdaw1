@@ -175,8 +175,8 @@ RunService.RenderStepped:Connect(function()
         return
     end
 
-    LocalHumanoidRootPart.CFrame = HumanoidRootPart.CFrame
-
+    LocalHumanoidRootPart.CFrame = HumanoidRootPart.CFrame * CFrame.Angles(0, math.random() * math.pi*2, 0)
+	
     if tick() - TrackStartTime >= TimePerPlayer or HumanoidRootPart.Velocity.Magnitude > 500 then
         CurrentIndex += 1
         TrackStartTime = tick()
