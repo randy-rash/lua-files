@@ -36,12 +36,12 @@ repeat task.wait() until ChatMain.MessagePosted
 
 --all of these are in seconds
 local TimePerPlayer = 5
-local ChatTime = 3
+local ChatTime = 2
 local ServerHopTime = 120
 
 local Commands = {
 	'size me 2',
-	'name me '.. string.rep('burying ', 100),
+	'name me '.. string.rep('burying ', 50),
 	'color me red',
 	'hat me 24114402',
 	'hat me 305888394',
