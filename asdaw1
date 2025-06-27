@@ -146,10 +146,20 @@ local Chat = function(Message)
         end
     end
 end
+
+local LastMsg = ''
 task.spawn(function()
     while true do
-        Chat(Messages[math.random(1, #Messages)])
-        task.wait(ChatTime)
+		local RandomMsg
+
+		repeat
+			RandomMsg = Messages[math.random(1, #Messages)]
+		until RandomMsg ~= LastMsg
+
+		Chat(RandomMsg)
+		LastMsg = RandomMsg
+
+		task.wait(ChatTime)
     end
 end)
 
