@@ -19,7 +19,7 @@ local LocalPlayer = Players.LocalPlayer
 local LocalCharacter = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local LocalHumanoidRootPart = LocalCharacter:WaitForChild('HumanoidRootPart')
 
-if game.PlaceId == '5913858916' then
+if game.PlaceId == 5913858916 then
 -- idfk anymore
 repeat task.wait() until LocalPlayer:FindFirstChild("PlayerScripts")
 local PlayerScripts = LocalPlayer.PlayerScripts
@@ -71,8 +71,8 @@ local Messages = {
 	'join /burying if ur cool',
 	"bored? join /burying we're making a hangout game",
 	'bro what is happening in /burying',
-	'______________________________',
-	'____a'
+	'_______________________________________________________________________________________________________________________________________________________________________________',
+	'LOOL BRO WHAT IS HAPPENING IN /burying'
 }
 
 local ServerHop = function()
