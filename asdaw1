@@ -72,9 +72,14 @@ local Messages = {
 	"bored? join /burying we're making a hangout game",
 	'bro what is happening in /burying',
 	'_______________________________________________________________________________________________________________________________________________________________________________',
-	'LOOL BRO WHAT IS HAPPENING IN /burying'
+	'LOOL BRO WHAT IS HAPPENING IN /burying',
+	'new hangout game /burying',
+	'egirls at burying /burying',
+	'join this for gws /burying',
+	'nitro gws /burying',
+	'join for a better hangout game /burying',
+	'lonely? join /burying'
 }
-
 
 local ServerHop = function()
     task.wait(5)
