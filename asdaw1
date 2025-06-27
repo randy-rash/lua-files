@@ -19,7 +19,7 @@ local LocalPlayer = Players.LocalPlayer
 local LocalCharacter = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local LocalHumanoidRootPart = LocalCharacter:WaitForChild('HumanoidRootPart')
 
-
+if game.PlaceId == '5913858916' then
 -- idfk anymore
 repeat task.wait() until LocalPlayer:FindFirstChild("PlayerScripts")
 local PlayerScripts = LocalPlayer.PlayerScripts
@@ -58,6 +58,8 @@ task.spawn(function ()
 	end
 end)
 
+end
+
 for _,v in workspace:GetDescendants() do
 	if v:IsA('Seat') then
 		v:Destroy()
@@ -69,8 +71,8 @@ local Messages = {
 	'join /burying if ur cool',
 	"bored? join /burying we're making a hangout game",
 	'bro what is happening in /burying',
-	'___',
-	'____'
+	'______________________________',
+	'____a'
 }
 
 local ServerHop = function()
