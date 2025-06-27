@@ -70,10 +70,10 @@ local function ServerHop()
     
 	local Success, Body = pcall(HttpService.JSONDecode, HttpService, ReqResult)
     if not Success or not Body or not Body.data then
-        warn("Failed to decode server data")
+        warn('Failed to decode JSON')
         return
     end
-	
+
     for _, Server in Body.data do
         if typeof(Server) == 'table' and tonumber(Server.playing) and tonumber(Server.maxPlayers) and 
            Server.playing < Server.maxPlayers and Server.id ~= game.JobId then
@@ -92,7 +92,9 @@ end
 task.spawn(function()
 	queueonteleport([[loadstring(game:HttpGet('https://raw.githubusercontent.com/randy-rash/lua-files/refs/heads/main/asdaw1'))()]])
 	task.wait(ServerHopTime)
-	ServerHop()
+	while task.wait() do
+		ServerHop()
+	end
 end)
 
 local Chat = function(Message)
