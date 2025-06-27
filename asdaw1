@@ -1,0 +1,145 @@
+local Services = function(Name)
+    return cloneref(game:GetService(Name))
+end
+
+workspace.FallenPartsDestroyHeight = 0/0 -- don't even think about it girl
+
+local Players = Services('Players')
+local RunService = Services('RunService')
+local HttpService = Services('HttpService')
+local TextChatService = Services('TextChatService')
+local TeleportService = Services('TeleportService')
+local ReplicatedStorage = Services('ReplicatedStorage')
+
+local LocalPlayer = Players.LocalPlayer
+local LocalCharacter = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local LocalHumanoidRootPart = LocalCharacter:WaitForChild('HumanoidRootPart')
+
+local ChatMain = require(LocalPlayer.PlayerScripts.ChatScript.ChatMain)
+
+-- ts is self explanatory
+
+--all of these are in seconds
+local TimePerPlayer = 5
+local ChatTime = 2
+local ServerHopTime = 5
+
+local Commands = {
+	'size me 4',
+	'name me '.. string.rep('burying ', 100),
+	'color me red',
+	'hat me 24114402',
+	'hat me 305888394',
+	'hat me 33070696',
+	'hat me 24112667'
+}
+
+for _, Command in Commands do
+	ChatMain.MessagePosted.fire('All', '/'.. tostring(Command))
+	task.wait()
+end
+
+local Messages = { 
+    'hi1',
+    'hi2',
+    'hi3',
+}
+
+local function ServerHop()
+    local Servers = {}
+    
+    local Success, ReqResult = pcall(function()
+        return game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true")
+    end)
+    
+    if not Success then
+        warn("Failed to get servers:", ReqResult)
+        return
+    end
+    
+	local Body = HttpService:JSONDecode(ReqResult)
+
+    for _, Server in Body.data do
+        if typeof(Server) == 'table' and tonumber(Server.playing) and tonumber(Server.maxPlayers) and 
+           Server.playing < Server.maxPlayers and Server.id ~= game.JobId then
+            table.insert(Servers, Server.id)
+        end
+    end
+    
+    if #Servers > 0 then
+        local SelectedServer = Servers[math.random(1, #Servers)]
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, SelectedServer, LocalPlayer)
+    else
+        warn("No available servers found")
+    end
+end
+
+task.spawn(function()
+	task.wait(ServerHopTime)
+	ServerHop()
+end)
+
+local Chat = function(Message)
+    local Msg = tostring(Message)
+    if TextChatService.ChatVersion ~= Enum.ChatVersion.LegacyChatService then
+        TextChatService.TextChannels.RBXGeneral:SendAsync(Msg)
+    else
+        local ChatEvents = ReplicatedStorage:FindFirstChild('DefaultChatSystemChatEvents')
+        if ChatEvents and ChatEvents:FindFirstChild('SayMessageRequest') then
+            ChatEvents.SayMessageRequest:FireServer(Msg, 'All')
+        end
+    end
+end
+task.spawn(function()
+    while true do
+        Chat(Messages[math.random(1, #Messages)])
+        task.wait(ChatTime)
+    end
+end)
+
+local PlayerQueue = {}
+local CurrentIndex = 1
+local TrackStartTime = tick()
+
+RunService.RenderStepped:Connect(function()
+    if #PlayerQueue == 0 then
+        PlayerQueue = Players:GetPlayers()
+        for i = #PlayerQueue, 1, -1 do
+            if PlayerQueue[i] == LocalPlayer then
+                table.remove(PlayerQueue, i)
+                break
+            end
+        end
+        CurrentIndex = 1
+        TrackStartTime = tick()
+        return
+    end
+
+    local CurrentPlayer = PlayerQueue[CurrentIndex]
+    if not CurrentPlayer then return end
+
+    local Character = CurrentPlayer.Character
+    local HumanoidRootPart = Character and Character:FindFirstChild('HumanoidRootPart')
+    local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+
+    if not Character or not Humanoid or Humanoid.Health <= 0 or not HumanoidRootPart then
+        CurrentIndex += 1
+        TrackStartTime = tick()
+        if CurrentIndex > #PlayerQueue then
+            PlayerQueue = {}
+        end
+        return
+    end
+
+    LocalHumanoidRootPart.CFrame = HumanoidRootPart.CFrame
+
+    if tick() - TrackStartTime >= TimePerPlayer or HumanoidRootPart.Velocity.Magnitude > 500 then
+        CurrentIndex += 1
+        TrackStartTime = tick()
+
+        if CurrentIndex > #PlayerQueue then
+            PlayerQueue = {}
+        end
+    end
+end)
+
