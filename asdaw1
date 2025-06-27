@@ -28,6 +28,8 @@ local ChatScript = PlayerScripts.ChatScript
 repeat task.wait() until ChatScript:FindFirstChild("ChatMain")
 local ChatMain = require(ChatScript.ChatMain)
 
+repeat task.wait() until ChatMain.MessagePosted
+
 -- ts is self explanatory
 
 --all of these are in seconds
