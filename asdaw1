@@ -59,7 +59,7 @@ end
 
 local TimePerPlayer = 5
 local ChatTime = 2
-local ServerHopTime = 5
+local ServerHopTime = 15
 
 game:GetService("RunService"):Set3dRenderingEnabled(false)
 setfpscap(30)
