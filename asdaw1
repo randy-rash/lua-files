@@ -89,7 +89,7 @@ local ServerHop = function()
 	
     local Success, ReqResult = pcall(function()
         return game:HttpGet(
-            'https://games.roblox.com/v1/games/5913858916/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true',
+            'https://games.roblox.com/v1/games/.. game.PlaceId ../servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true',
             true 
         )
     end)
