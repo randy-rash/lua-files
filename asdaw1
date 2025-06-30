@@ -1,7 +1,17 @@
+queueonteleport([[loadstring(game:HttpGet('https://raw.githubusercontent.com/randy-rash/lua-files/refs/heads/main/asdaw1'))()]])
+
+local Services = function(Name)
+    return cloneref(game:GetService(Name))
+end
+
+local Players = Services('Players')
+local RunService = Services('RunService')
+local HttpService = Services('HttpService')
+local TextChatService = Services('TextChatService')
+local TeleportService = Services('TeleportService')
+local ReplicatedStorage = Services('ReplicatedStorage')
+
 local ServerHop = function()
-    local HttpService = game:GetService('HttpService')
-    local TeleportService = game:GetService('TeleportService')
-    
     local Success, Result = pcall(function()
         return HttpService:GetAsync(string.format(
             'https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100',
@@ -18,7 +28,7 @@ local ServerHop = function()
     local Servers = {}
     
     for _, Server in Data.data do
-        if type(Server) == 'table' and Server.id ~= game.JobId then
+        if typeof(Server) == 'table' and Server.id ~= game.JobId then
             table.insert(Servers, Server.id)
         end
     end
@@ -30,35 +40,31 @@ local ServerHop = function()
     end
 end
 
-local LoadStart = tick()
-if not game:IsLoaded() then 
-    local LoadedConnection
-    LoadedConnection = game.Loaded:Connect(function()
-        LoadedConnection:Disconnect()
-        if tick() - LoadStart > 30 then
-           ServerHop()
-        end
-    end)
-    game.Loaded:Wait()
-    if tick() - LoadStart > 30 then
-        return
-    end
-end
+local Timer = 0
+local Loaded = function()
+	if game:IsLoaded() and game.Players.LocalPlayer then
+		return true
+	end	
+	return false
+end	
+
+local Connection
+Connection = RunService.RenderStepped:Connect(function(Delta)
+	Timer += Delta
+
+	if Timer >= 10 then
+		Connection:Disconnect()
+		if not Loaded() then
+			ServerHop
+		end
+	elseif Loaded() then
+		Connection:Disconnect()
+	end	
+end)	
 
 task.wait(5)
 
-local Services = function(Name)
-    return cloneref(game:GetService(Name))
-end
-
 workspace.FallenPartsDestroyHeight = 0/0 -- don't even think about it girl
-
-local Players = Services('Players')
-local RunService = Services('RunService')
-local HttpService = Services('HttpService')
-local TextChatService = Services('TextChatService')
-local TeleportService = Services('TeleportService')
-local ReplicatedStorage = Services('ReplicatedStorage')
 
 local LocalPlayer = Players.LocalPlayer
 local LocalCharacter = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -77,10 +83,9 @@ local ChatMain = require(ChatScript.ChatMain)
 
 repeat task.wait() until ChatMain.MessagePosted
 
+
+
 -- ts is self explanatory
-
---all of these are in seconds
-
 local Commands = {
 	'size me 2',
 	'name me '.. string.rep('burying ', 50),
@@ -101,6 +106,7 @@ task.spawn(function ()
 end)
 end
 
+--all of these are in seconds
 local TimePerPlayer = 5
 local ChatTime = 2
 local ServerHopTime = 15
@@ -108,9 +114,9 @@ local ServerHopTime = 15
 RunService:Set3dRenderingEnabled(false)
 setfpscap(30)
 
-for _,v in workspace:GetDescendants() do
-	if v:IsA('Seat') then
-		v:Destroy()
+for _,Seat in workspace:GetDescendants() do
+	if Seat:IsA('Seat') then
+		Seat:Destroy()
 	end	
 end
 
@@ -130,7 +136,6 @@ local Messages = {
 }
 
 task.spawn(function()
-	queueonteleport([[loadstring(game:HttpGet('https://raw.githubusercontent.com/randy-rash/lua-files/refs/heads/main/asdaw1'))()]])
 	task.wait(ServerHopTime)
 	
 	while task.wait(0.5) do
