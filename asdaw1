@@ -62,6 +62,10 @@ Connection = RunService.RenderStepped:Connect(function(Delta)
 	end	
 end)	
 
+if not Loaded() then 
+	repeat task.wait() until Loaded()
+end
+
 task.wait(5)
 
 workspace.FallenPartsDestroyHeight = 0/0 -- don't even think about it girl
