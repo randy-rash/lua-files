@@ -11,8 +11,6 @@ local TextChatService = Services('TextChatService')
 local TeleportService = Services('TeleportService')
 local ReplicatedStorage = Services('ReplicatedStorage')
 
-RunService:Set3dRenderingEnabled(false)
-setfpscap(30)
 
 local ServerHop = function()
     local Success, Result = pcall(function()
@@ -62,7 +60,8 @@ local ServerHop = function()
     if #Servers > 0 then
         local SelectedServer = Servers[math.random(1, #Servers)]
         TeleportService:TeleportToPlaceInstance(game.PlaceId, SelectedServer, LocalPlayer)
-    end
+		print('Serverhopped to '.. SelectedServer)
+	end
 end
 
 local Timer = 0
@@ -94,6 +93,9 @@ workspace.FallenPartsDestroyHeight = 0/0 -- don't even think about it girl
 local LocalPlayer = Players.LocalPlayer
 local LocalCharacter = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local LocalHumanoidRootPart = LocalCharacter:WaitForChild('HumanoidRootPart')
+
+RunService:Set3dRenderingEnabled(false)
+setfpscap(30)
 
 if game.PlaceId == 5913858916 then
 -- idfk anymore
@@ -138,7 +140,7 @@ end
 --all of these are in seconds
 local TimePerPlayer = 5
 local ChatTime = 1.5
-local ServerHopTime = 15
+local ServerHopTime = 5
 
 local Messages = { 
   "join /burying we're a new hangout game",
@@ -159,7 +161,7 @@ task.spawn(function()
 	task.wait(ServerHopTime)
 	
 	while task.wait(0.5) do
-	ServerHop()
+		ServerHop()
 	end
 end)
 
