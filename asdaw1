@@ -55,7 +55,7 @@ Connection = RunService.RenderStepped:Connect(function(Delta)
 	if Timer >= 10 then
 		Connection:Disconnect()
 		if not Loaded() then
-			ServerHop
+			ServerHop()
 		end
 	elseif Loaded() then
 		Connection:Disconnect()
