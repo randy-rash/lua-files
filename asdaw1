@@ -88,6 +88,8 @@ end)
 
 if not Loaded() then game.Loaded:Wait() end
 
+task.wait(3)
+
 workspace.FallenPartsDestroyHeight = 0/0 -- don't even think about it girl
 
 local LocalPlayer = Players.LocalPlayer
@@ -119,8 +121,7 @@ local Commands = {
 	'hat me 305888394',
 	'hat me 33070696',
 	'hat me 24112667',
-	'sparkles',
-	'fire'
+	'hotdance me 5'
 }
 
 task.spawn(function ()
