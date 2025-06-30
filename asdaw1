@@ -1,5 +1,49 @@
+local ServerHop = function()
+    local HttpService = game:GetService('HttpService')
+    local TeleportService = game:GetService('TeleportService')
+    
+    local Success, Result = pcall(function()
+        return HttpService:GetAsync(string.format(
+            'https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100',
+            game.PlaceId
+        ))
+    end)
 
-if not game:IsLoaded() then game.Loaded:Wait() end
+    if not Success then
+        warn('Failed to fetch servers:', Result)
+        return TeleportService:Teleport(game.PlaceId)
+    end
+
+    local Data = HttpService:JSONDecode(Result)
+    local Servers = {}
+    
+    for _, Server in Data.data do
+        if type(Server) == 'table' and Server.id ~= game.JobId then
+            table.insert(Servers, Server.id)
+        end
+    end
+
+    if #Servers > 0 then
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, Servers[math.random(1, #Servers)])
+    else
+        TeleportService:Teleport(game.PlaceId)
+    end
+end
+
+local LoadStart = tick()
+if not game:IsLoaded() then 
+    local LoadedConnection
+    LoadedConnection = game.Loaded:Connect(function()
+        LoadedConnection:Disconnect()
+        if tick() - LoadStart > 30 then
+           ServerHop()
+        end
+    end)
+    game.Loaded:Wait()
+    if tick() - LoadStart > 30 then
+        return
+    end
+end
 
 task.wait(5)
 
@@ -22,13 +66,13 @@ local LocalHumanoidRootPart = LocalCharacter:WaitForChild('HumanoidRootPart')
 
 if game.PlaceId == 5913858916 then
 -- idfk anymore
-repeat task.wait() until LocalPlayer:FindFirstChild("PlayerScripts")
+repeat task.wait() until LocalPlayer:FindFirstChild('PlayerScripts')
 local PlayerScripts = LocalPlayer.PlayerScripts
 
-repeat task.wait() until PlayerScripts:FindFirstChild("ChatScript")
+repeat task.wait() until PlayerScripts:FindFirstChild('ChatScript')
 local ChatScript = PlayerScripts.ChatScript
 
-repeat task.wait() until ChatScript:FindFirstChild("ChatMain")
+repeat task.wait() until ChatScript:FindFirstChild('ChatMain')
 local ChatMain = require(ChatScript.ChatMain)
 
 repeat task.wait() until ChatMain.MessagePosted
@@ -61,7 +105,7 @@ local TimePerPlayer = 5
 local ChatTime = 2
 local ServerHopTime = 15
 
-game:GetService("RunService"):Set3dRenderingEnabled(false)
+RunService:Set3dRenderingEnabled(false)
 setfpscap(30)
 
 for _,v in workspace:GetDescendants() do
@@ -84,59 +128,6 @@ local Messages = {
 	'join for a better hangout game /burying',
 	'lonely? join /burying'
 }
-
-local ServerHop = function()
-    task.wait(5)
-	
-    local Success, ReqResult = pcall(function()
-        return game:HttpGet(
-            'https://games.roblox.com/v1/games/'.. game.PlaceId ..'/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true',
-            true 
-        )
-    end)
-
-    if not Success then
-        warn('Request failed', ReqResult)
-        return 
-    end
-
-    if ReqResult == '{"errors":[{"code":0,"message":"Too many requests"}]}' then
-        warn('Rate limited')
-        task.wait(30)
-        return 
-    end
-
-    if not ReqResult or ReqResult == "" then
-        return 
-    end
-
-    local Success, Body = pcall(HttpService.JSONDecode, HttpService, ReqResult)
-    if not Success then
-        warn('Cannot decode JSON', ReqResult)
-        return 
-    end
-
-    if not Body or not Body.data then
-        return
-    end
-
-    local Servers = {}
-    for _, Server in ipairs(Body.data) do
-        if type(Server) == "table" 
-            and tonumber(Server.playing) 
-            and tonumber(Server.maxPlayers) 
-            and Server.playing < Server.maxPlayers 
-            and Server.id ~= game.JobId 
-        then
-            table.insert(Servers, Server.id)
-        end
-    end
-
-    if #Servers > 0 then
-        local SelectedServer = Servers[math.random(1, #Servers)]
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, SelectedServer, LocalPlayer)
-    end
-end
 
 task.spawn(function()
 	queueonteleport([[loadstring(game:HttpGet('https://raw.githubusercontent.com/randy-rash/lua-files/refs/heads/main/asdaw1'))()]])
