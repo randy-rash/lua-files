@@ -61,7 +61,7 @@ Connection = RunService.RenderStepped:Connect(function(Delta)
 		Connection:Disconnect()
 	end	
 end)	
-
+-- I was doing Loaded() here but it didnt work????????????
 if not game:IsLoaded() then game.Loaded:Wait() end
 
 task.wait(5)
