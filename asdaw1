@@ -62,9 +62,7 @@ Connection = RunService.RenderStepped:Connect(function(Delta)
 	end	
 end)	
 
-if not Loaded() then 
-	repeat task.wait() until Loaded()
-end
+if not game:IsLoaded() then game.Loaded:Wait() end
 
 task.wait(5)
 
