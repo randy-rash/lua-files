@@ -13,55 +13,109 @@ local ReplicatedStorage = Services('ReplicatedStorage')
 
 
 local ServerHop = function()
-    local Success, Result = pcall(function()
-        return game:HttpGet(
-            'https://games.roblox.com/v1/games/'.. game.PlaceId ..'/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true',
-            true
-        )
+    local ServerHistory = {}
+    local HistoryFileName = "ServerHopHistory.json"
+    local CurrentTime = os.time() 
+    
+    local Success, LoadedData = pcall(function()
+        return HttpService:JSONDecode(readfile(HistoryFileName))
     end)
-
-    if not Success then
-        warn('Request failed', Result)
-        return 
-    end
-
-    if Result == '{"errors":[{"code":0,"message":"Too many requests"}]}' then
-        warn('Rate limited')
-        task.wait(10)
-        return 
-    end
-
-    if not Result or Result == '' then
-        return
-    end
-
-    local Success, Body = pcall(HttpService.JSONDecode, HttpService, Result)
-    if not Success then
-        warn('Cannot decode JSON', Result)
-        return 
-    end
-
-    if not Body or not Body.data then
-        return
-    end
-
-    local Servers = {}
-    for _, Server in Body.data do 
-        if typeof(Server) == "table" 
-            and tonumber(Server.playing) 
-            and tonumber(Server.maxPlayers) 
-            and Server.playing < Server.maxPlayers 
-            and Server.id ~= game.JobId 
-        then
-            table.insert(Servers, Server.id)
+    
+    if Success and LoadedData then
+        if LoadedData.Timestamp and (CurrentTime - LoadedData.Timestamp) < 600 then
+            ServerHistory = LoadedData.Servers or {}
         end
     end
 
-    if #Servers > 0 then
-        local SelectedServer = Servers[math.random(1, #Servers)]
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, SelectedServer, LocalPlayer)
-		print('Serverhopped to '.. SelectedServer)
-	end
+    while true do
+        local Cursor = nil
+        local ValidServers = {}
+
+        local FetchServers = function(Cursor)
+            local Url = 'https://games.roblox.com/v1/games/'.. game.PlaceId ..'/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true'
+            if Cursor and Cursor ~= "" then
+                Url = Url .. '&cursor=' .. Cursor
+            end
+
+            local Success, Result = pcall(function()
+                return game:HttpGet(Url, true)
+            end)
+
+            if not Success then
+                warn('Request failed', Result)
+                return nil
+            end
+
+            if Result == '{"errors":[{"code":0,"message":"Too many requests"}]}' then
+                warn('Rate limited')
+                task.wait(10)
+                return nil
+            end
+
+            if not Result or Result == '' then
+                return nil
+            end
+
+            local Success, Body = pcall(HttpService.JSONDecode, HttpService, Result)
+            if not Success or not Body or not Body.data then
+                warn('Cannot decode JSON or invalid response')
+                return nil
+            end
+
+            return Body
+        end
+
+        repeat
+            local Body = FetchServers(Cursor)
+            if not Body then
+                task.wait(5)
+                break
+            end
+            
+            Cursor = Body.nextPageCursor
+            
+            for _, Server in Body.data do
+                if typeof(Server) == "table" and 
+                   tonumber(Server.playing) and 
+                   tonumber(Server.maxPlayers) and 
+                   Server.playing < Server.maxPlayers and 
+                   Server.id ~= game.JobId then
+                    
+                    local IsNewServer = true
+                    for _, Id in ServerHistory do
+                        if tostring(Id) == tostring(Server.id) then
+                            IsNewServer = false
+                            break
+                        end
+                    end
+                    
+                    if IsNewServer then
+                        table.insert(ValidServers, Server.id)
+                    end
+                end
+            end
+            
+            if #ValidServers > 0 then
+                local SelectedServer = ValidServers[math.random(1, #ValidServers)]
+                
+                table.insert(ServerHistory, SelectedServer)
+                pcall(function()
+                    writefile(HistoryFileName, HttpService:JSONEncode({
+                        Timestamp = os.time(),
+                        Servers = ServerHistory
+                    }))
+                end)
+                
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, SelectedServer, LocalPlayer)
+                print('Serverhopped to '.. SelectedServer)
+                return
+            end
+            
+            task.wait(1)
+        until not Cursor or Cursor == ""
+        
+        task.wait(5)
+    end
 end
 
 local Timer = 0
