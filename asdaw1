@@ -11,32 +11,57 @@ local TextChatService = Services('TextChatService')
 local TeleportService = Services('TeleportService')
 local ReplicatedStorage = Services('ReplicatedStorage')
 
+RunService:Set3dRenderingEnabled(false)
+setfpscap(30)
+
 local ServerHop = function()
     local Success, Result = pcall(function()
-        return HttpService:GetAsync(string.format(
-            'https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100',
-            game.PlaceId
-        ))
+        return game:HttpGet(
+            'https://games.roblox.com/v1/games/'.. game.PlaceId ..'/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true',
+            true
+        )
     end)
 
     if not Success then
-        warn('Failed to fetch servers:', Result)
-        return TeleportService:Teleport(game.PlaceId)
+        warn('Request failed', Result)
+        return 
     end
 
-    local Data = HttpService:JSONDecode(Result)
+    if Result == '{"errors":[{"code":0,"message":"Too many requests"}]}' then
+        warn('Rate limited')
+        task.wait(10)
+        return 
+    end
+
+    if not Result or Result == '' then
+        return
+    end
+
+    local Success, Body = pcall(HttpService.JSONDecode, HttpService, Result)
+    if not Success then
+        warn('Cannot decode JSON', Result)
+        return 
+    end
+
+    if not Body or not Body.data then
+        return
+    end
+
     local Servers = {}
-    
-    for _, Server in Data.data do
-        if typeof(Server) == 'table' and Server.id ~= game.JobId then
+    for _, Server in Body.data do 
+        if typeof(Server) == "table" 
+            and tonumber(Server.playing) 
+            and tonumber(Server.maxPlayers) 
+            and Server.playing < Server.maxPlayers 
+            and Server.id ~= game.JobId 
+        then
             table.insert(Servers, Server.id)
         end
     end
 
     if #Servers > 0 then
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, Servers[math.random(1, #Servers)])
-    else
-        TeleportService:Teleport(game.PlaceId)
+        local SelectedServer = Servers[math.random(1, #Servers)]
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, SelectedServer, LocalPlayer)
     end
 end
 
@@ -61,10 +86,8 @@ Connection = RunService.RenderStepped:Connect(function(Delta)
 		Connection:Disconnect()
 	end	
 end)	
--- I was doing Loaded() here but it didnt work????????????
-if not game:IsLoaded() then game.Loaded:Wait() end
 
-task.wait(5)
+if not Loaded() then game.Loaded:Wait() end
 
 workspace.FallenPartsDestroyHeight = 0/0 -- don't even think about it girl
 
@@ -85,8 +108,6 @@ local ChatMain = require(ChatScript.ChatMain)
 
 repeat task.wait() until ChatMain.MessagePosted
 
-
-
 -- ts is self explanatory
 local Commands = {
 	'size me 2',
@@ -101,29 +122,26 @@ local Commands = {
 }
 
 task.spawn(function ()
-	for _, Command in Commands do
-		ChatMain.MessagePosted.fire('All', '/'.. tostring(Command))
-		task.wait(1)
-	end
-end)
+      for _, Command in Commands do
+        ChatMain.MessagePosted.fire('All', '/'.. tostring(Command))
+        task.wait(1)
+      end
+  end)
+end
+
+for _,Seat in workspace:GetDescendants() do
+  if Seat:IsA('Seat') then
+    Seat:Destroy()
+  end	
 end
 
 --all of these are in seconds
 local TimePerPlayer = 5
-local ChatTime = 2
+local ChatTime = 1.5
 local ServerHopTime = 15
 
-RunService:Set3dRenderingEnabled(false)
-setfpscap(30)
-
-for _,Seat in workspace:GetDescendants() do
-	if Seat:IsA('Seat') then
-		Seat:Destroy()
-	end	
-end
-
 local Messages = { 
-    "join /burying we're a new hangout game",
+  "join /burying we're a new hangout game",
 	'join /burying if ur cool',
 	"bored? join /burying we're making a hangout game",
 	'bro what is happening in /burying',
@@ -141,7 +159,7 @@ task.spawn(function()
 	task.wait(ServerHopTime)
 	
 	while task.wait(0.5) do
-		ServerHop()
+	ServerHop()
 	end
 end)
 
