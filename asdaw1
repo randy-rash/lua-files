@@ -30,7 +30,7 @@ local ServerHop = function()
         return false
     end
 
-    if not ReqResult or ReqResult == "" then
+    if not ReqResult or ReqResult == '' then
         warn('Empty response')
         return false
     end
@@ -51,7 +51,7 @@ local ServerHop = function()
             local maxPlayers = tonumber(Server.maxPlayers)
             if playing and 
 			maxPlayers and 
-			playing + 1 < maxPlayers and 
+			playing + 3 < maxPlayers and 
 			tostring(Server.id) ~= game.JobId then
                 table.insert(Servers, Server.id)
             end
