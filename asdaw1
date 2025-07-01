@@ -114,13 +114,13 @@ repeat task.wait() until ChatMain.MessagePosted
 -- ts is self explanatory
 local Commands = {
 	'size me 2',
-	'name me '.. string.rep('burying ', 50),
+	'name me '.. string.rep('burying ', 25),
 	'color me red',
 	'hat me 24114402',
 	'hat me 305888394',
 	'hat me 33070696',
 	'hat me 24112667',
-	'sparkles',
+	'hotdance me 2',
 	'fire'
 }
 
