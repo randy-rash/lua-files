@@ -145,6 +145,7 @@ local ChatTime = 2
 local ServerHopTime = 15
 local RetryCooldown = 10
 
+RunService:Set3dRenderingEnabled(false)
 setfpscap(30)
 
 for _,Seat in workspace:GetDescendants() do
