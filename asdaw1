@@ -195,7 +195,7 @@ end
 --all of these are in seconds
 local TimePerPlayer = 5
 local ChatTime = 1.5
-local ServerHopTime = 5
+local ServerHopTime = 15
 
 local Messages = { 
   "join /burying we're a new hangout game",
