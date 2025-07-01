@@ -25,48 +25,48 @@ local ServerHop = function()
     end
 
     if ReqResult == '{"errors":[{"code":0,"message":"Too many requests"}]}' then
-        warn('Rate limited, waiting 30 seconds before next attempt...')
+        warn('Rate limited, waiting 30 seconds...')
         task.wait(30)
         return false
     end
 
     if not ReqResult or ReqResult == "" then
-        warn('Request returned empty result.')
+        warn('Empty response')
         return false
     end
 
     local Success, Body = pcall(HttpService.JSONDecode, HttpService, ReqResult)
-    if not Success then
-        warn('Cannot decode JSON', ReqResult)
-        return false
-    end
-
-    if not Body or not Body.data then
-        warn('JSON body is invalid.')
+    if not Success or not Body or not Body.data then
+        warn('JSON decode failed')
         return false
     end
 
     local Servers = {}
     for _, Server in Body.data do
-        if typeof(Server) == 'table'
-            and tonumber(Server.playing) 
-            and tonumber(Server.maxPlayers) 
-            and Server.playing < Server.maxPlayers 
-            and Server.id ~= game.JobId
-			and Server.playing ~= 0
-        then
-            table.insert(Servers, Server.id)
+        if typeof(Server) == 'table' and 
+		Server.id and 
+		Server.playing and 
+		Server.maxPlayers then
+            local playing = tonumber(Server.playing)
+            local maxPlayers = tonumber(Server.maxPlayers)
+            if playing and 
+			maxPlayers and 
+			playing + 1 < maxPlayers and 
+			tostring(Server.id) ~= game.JobId then
+                table.insert(Servers, Server.id)
+            end
         end
     end
 
     if #Servers > 0 then
         local SelectedServer = Servers[math.random(1, #Servers)]
-        print('Server found. Teleporting to ' .. SelectedServer)
+        print('Teleporting to server:', SelectedServer)
+        task.wait(1)
         TeleportService:TeleportToPlaceInstance(game.PlaceId, SelectedServer, LocalPlayer)
         return true
     else
-        warn('No server found')
-        return false 
+        warn('No valid servers found.')
+        return false
     end
 end
 
