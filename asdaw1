@@ -53,7 +53,7 @@ local ServerHop = function()
             and tonumber(Server.maxPlayers) 
             and Server.playing < Server.maxPlayers 
             and Server.id ~= game.JobId
-			and Server.playing < 0
+			and Server.playing ~= 0
         then
             table.insert(Servers, Server.id)
         end
