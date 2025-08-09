@@ -1,0 +1,68 @@
+local RunService = game:GetService('RunService')
+local UserInputService = game:GetService('UserInputService')
+
+local LocalPlayer = game.Players.LocalPlayer
+local LocalCharacter = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local LocalHumanoid = LocalCharacter:WaitForChild('Humanoid')
+local LocalRoot = LocalCharacter:WaitForChild('HumanoidRootPart')
+
+local UndergroundEnabled = false
+
+local AnimationTrack = Instance.new('Animation')
+AnimationTrack.AnimationId = 'rbxassetid://15609995579' 
+
+UserInputService.InputBegan:Connect(function(Input, GameProcessed)
+	if not GameProcessed and Input.KeyCode == Enum.KeyCode.U then
+		UndergroundEnabled = not UndergroundEnabled
+	end
+end)
+
+RunService.Heartbeat:Connect(function()
+	if LocalHumanoid and UndergroundEnabled then
+		if not (LocalCharacter and LocalHumanoid and LocalCharacter:FindFirstChild('HumanoidRootPart')) then
+			pcall(function()
+				if Animation then
+					Animation:Stop()
+				end
+			end)
+			Animation = nil
+			return
+		end
+
+		if not Animation then
+			Animation = LocalHumanoid:LoadAnimation(AnimationTrack)
+		end
+
+		local OldCFrame = LocalRoot.CFrame
+		local Offset = LocalHumanoid.CameraOffset
+
+		Animation:Play(0, 1, 0)
+		Animation.TimePosition = 2.37
+
+		local NewCFrame = OldCFrame * CFrame.new(0, -1.1, 0) * CFrame.Angles(math.rad(90), 0, 0)
+		LocalHumanoid.HipHeight = 0.1
+		LocalRoot.CFrame = NewCFrame
+		LocalHumanoid.CameraOffset = NewCFrame:ToObjectSpace(CFrame.new(OldCFrame.Position)).Position
+
+		RunService.RenderStepped:Wait()
+
+		Animation:Stop()
+		LocalHumanoid.CameraOffset = Offset
+		LocalHumanoid.HipHeight = 1
+		LocalRoot.CFrame = OldCFrame
+	end
+end)
+
+local Nammecall
+Namecall = hookmetamethod(game, '__namecall', function(self, ...)
+  local Method = getnamecallmethod()
+  local Args = {...}
+  
+  if not checkcaller() and Method == 'FireServer' then
+    if self.Name == 'UpdateTilt' then
+        Args[1] = 1
+    end
+  end
+    
+  return Namecall(self, unpack(Args))
+end)
