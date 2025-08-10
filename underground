@@ -58,7 +58,7 @@ Namecall = hookmetamethod(game, '__namecall', function(self, ...)
   local Method = getnamecallmethod()
   local Args = {...}
   
-  if not checkcaller() and Method == 'FireServer' then
+  if not checkcaller() and Method == 'FireServer' and UndergroundEnabled then
     if self.Name == 'UpdateTilt' then
         Args[1] = 1
     end
