@@ -1,0 +1,41 @@
+local Workspace = game:GetService('Workspace')
+
+local Players = game:GetService('Players')
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character
+
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+local RunService = game:GetService('RunService')
+
+local Punch = ReplicatedStorage.Punch
+
+local GetClosestNpc = function()
+    local Closest, ClosestDistance = nil, math.huge
+
+    for _, Npc in Workspace:GetChildren() do
+        local Humanoid = Npc:FindFirstChildOfClass('Humanoid')
+        local RootPart = Npc:FindFirstChild('HumanoidRootPart')
+        if not (Humanoid and Npc:FindFirstChild('Attacker') and RootPart) then continue end
+
+        local Distance = (Character.PrimaryPart.Position - RootPart.Position).Magnitude
+        if Distance < ClosestDistance then
+            ClosestDistance = Distance
+            Closest = Npc
+        end 
+    end
+
+    return Closest
+end
+
+ReplicatedStorage.Block:FireServer(true) -- npc's wont damage you. atleast the starter ones idk
+
+while task.wait(1) do -- if u do it too fast ur game just crashes
+    Punch:FireServer(
+        GetClosestNpc().Humanoid,
+        6, -- 6 = 2x damage
+        Character.Cancellations.Value,
+        nil,
+        'DamageMultiplier: 1' -- this doesnt matter
+    )
+end
+
