@@ -29,13 +29,16 @@ end
 
 ReplicatedStorage.Block:FireServer(true) -- npc's wont damage you. atleast the starter ones idk
 
-while task.wait(1) do -- if u do it too fast ur game just crashes
-    Punch:FireServer(
-        GetClosestNpc().Humanoid,
-        6, -- 6 = 2x damage
-        Character.Cancellations.Value,
-        nil,
-        'DamageMultiplier: 1' -- this doesnt matter
-    )
+while true do
+    for i = 1, 6 do
+        Punch:FireServer(
+            GetClosestNpc().Humanoid,
+            i,
+            Character.Cancellations.Value,
+            nil,
+            'DamageMultiplier: 1' -- this doesnt matter
+        )
+        task.wait()
+    end
+    task.wait(1) -- if u do it too fast ur game just crashes
 end
-
