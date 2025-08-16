@@ -1,11 +1,17 @@
 local Workspace = game:GetService('Workspace')
 
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+local RunService = game:GetService('RunService')
+
 local Players = game:GetService('Players')
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character
 
-local ReplicatedStorage = game:GetService('ReplicatedStorage')
-local RunService = game:GetService('RunService')
+LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
+    Character = NewCharacter
+    ReplicatedStorage.Block:FireServer(true)
+end)
+
 
 local Punch = ReplicatedStorage.Punch
 
