@@ -12,7 +12,6 @@ LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
     ReplicatedStorage.Block:FireServer(true)
 end)
 
-
 local Punch = ReplicatedStorage.Punch
 
 local GetClosestNpc = function()
