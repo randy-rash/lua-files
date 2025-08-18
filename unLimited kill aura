@@ -18,11 +18,9 @@ local GetClosestNpc = function()
     local Closest, ClosestDistance = nil, math.huge
 
     for _, Npc in Workspace:GetChildren() do
-        if not Character then continue end
-        
         local Humanoid = Npc:FindFirstChildOfClass('Humanoid')
         local RootPart = Npc:FindFirstChild('HumanoidRootPart')
-        if not (Humanoid and Npc:FindFirstChild("Attacker") and RootPart) then continue end
+        if not (Humanoid and Npc:FindFirstChild("Attacker") and RootPart and Character) then continue end
 
         local Distance = (Character.PrimaryPart.Position - RootPart.Position).Magnitude
         if Distance < ClosestDistance then
